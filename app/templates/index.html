@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>LangChain Playground UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <h1>
+          <span class="logo-dot"></span>
+          LangChain Playground
+        </h1>
+        <p>
+          FastAPI + LangChain 체인을 테스트하기 위한 간단한 프론트입니다. 왼쪽은
+          <strong>챗</strong>, 오른쪽은 <strong>공부 계획</strong>을 호출합니다.
+        </p>
+      </header>
+
+      <main class="layout">
+        <!-- Chat card -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">
+              Chat Playground
+              <span class="badge">/chat</span>
+            </div>
+            <span class="status-line" id="chat-status">
+              <span class="status-dot"></span>
+              Ready
+            </span>
+          </div>
+          <p class="card-description">
+            LangChain + LLM 조합으로 챗 응답을 테스트합니다. system prompt를
+            바꿔가며 톤을 바꿔볼 수 있어요.
+          </p>
+
+          <div class="field-group">
+            <div class="field-label">
+              <span>System Prompt</span>
+              <span class="key">system_prompt</span>
+            </div>
+            <textarea id="systemPrompt" rows="3">
+You are a helpful AI assistant specialized in explaining code and development concepts in a concise and friendly way.</textarea
+            >
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">
+              <span>User Message</span>
+              <span class="key">user_message</span>
+            </div>
+            <textarea
+              id="userMessage"
+              rows="4"
+              placeholder="예: LangChain에서 prompt | model | parser 패턴이 뭐야?"
+            ></textarea>
+          </div>
+
+          <div class="btn-row">
+            <button type="button" class="secondary" onclick="clearChatOutput()">
+              Clear
+            </button>
+            <button type="button" onclick="callChat()">
+              <span>Send</span>
+              <span>↩</span>
+            </button>
+          </div>
+
+          <div class="output empty" id="chat-output">
+            <div class="output-title">
+              <span class="dot"></span>
+              Assistant Reply
+            </div>
+            <div class="output-content" id="chat-output-text">
+              아직 응답이 없습니다. 메시지를 보내보세요.
+            </div>
+          </div>
+        </section>
+
+        <!-- Study plan card -->
+        <section class="card">
+          <div class="card-header">
+            <div class="card-title">
+              Study Plan Generator
+              <span class="badge">/plan</span>
+            </div>
+            <span class="status-line" id="plan-status">
+              <span class="status-dot"></span>
+              Ready
+            </span>
+          </div>
+          <p class="card-description">
+            오늘/이번 시간 동안의 LangChain 공부 계획을 구조화된 JSON 형태로
+            생성합니다.
+          </p>
+
+          <div class="field-group">
+            <div class="field-label">
+              <span>Goal</span>
+              <span class="key">goal</span>
+            </div>
+            <textarea id="plan-goal" rows="3">
+LangChain 기본 개념을 이해하고, prompt | model | parser 패턴에 익숙해지고 싶어.</textarea
+            >
+          </div>
+
+          <div class="row">
+            <div class="field-group">
+              <div class="field-label">
+                <span>Available Hours</span>
+                <span class="key">available_hours</span>
+              </div>
+              <input
+                type="number"
+                id="plan-hours"
+                step="0.5"
+                min="0.5"
+                value="3"
+              />
+            </div>
+            <div class="field-group">
+              <div class="field-label">
+                <span>Level</span>
+                <span class="key">level</span>
+              </div>
+              <select id="plan-level">
+                <option value="beginner">Beginner</option>
+                <option value="intermediate" selected>Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="button" class="secondary" onclick="clearPlanOutput()">
+              Clear
+            </button>
+            <button type="button" onclick="callPlan()">
+              <span>Generate Plan</span>
+              <span>⚡</span>
+            </button>
+          </div>
+
+          <div class="output empty" id="plan-output">
+            <div class="output-title">
+              <span class="dot"></span>
+              Study Plan
+            </div>
+            <div class="output-content" id="plan-output-rendered">
+              아직 생성된 계획이 없습니다. 목표와 시간을 입력하고 Generate
+              버튼을 눌러보세요.
+            </div>
+            <div
+              style="
+                margin-top: 4px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <span class="raw-toggle" onclick="toggleRawJson()"
+                >Show raw JSON</span
+              >
+              <span style="font-size: 0.7rem; color: var(--text-muted)"
+                >응답 구조 확인용</span
+              >
+            </div>
+            <div
+              class="raw-json"
+              id="plan-output-raw"
+              style="display: none"
+            ></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/static/js/main.js" defer></script>
+  </body>
+</html>
