@@ -25,12 +25,3 @@ async def chat(req: ChatRequest):
         }
     )
     return ChatResponse(reply=result)
-
-    chain = build_chat_chain()
-    reply: str = await chain.ainvoke(
-        {
-            "system_prompt": req.system_prompt,
-            "user_message": req.user_message,
-        }
-    )
-    return ChatResponse(reply=reply)

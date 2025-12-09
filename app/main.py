@@ -3,10 +3,19 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from app.core.logging import setup_logging
 from app.routers import chat_router, plan_router
 
 
 app = FastAPI(title="LangChain Playground API")
+
+@app.on_event("startup")
+def startup_event():
+    """
+    Application startup event handler.
+    """
+    setup_logging()
+
 
 app.include_router(chat_router.router)
 app.include_router(plan_router.router)
