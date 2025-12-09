@@ -1,12 +1,15 @@
-// 같은 Origin에서 서빙되기 때문에 굳이 base URL은 필요 없음
-const API_BASE_URL = ""; // '' + '/chat' => '/chat'
+// API base URL is not needed as we are serving from the same origin
+const API_BASE_URL = "";
 
 // === Chat ===
 
 function setChatStatus(text, isError = false) {
   const el = document.getElementById("chat-status");
-  el.textContent = text;
-  el.classList.toggle("status-error", isError);
+  if (el) {
+    el.textContent = text;
+    el.classList.toggle("text-danger", isError);
+    el.classList.toggle("text-secondary", !isError);
+  }
 }
 
 function clearChatOutput() {
@@ -28,9 +31,9 @@ async function callChat() {
     return;
   }
 
-  setChatStatus("Sending request...");
+  setChatStatus("Sending...");
   box.classList.remove("empty");
-  content.textContent = "생각 중입니다...";
+  content.textContent = "Thinking...";
 
   const buttonEls = document.querySelectorAll("button");
   buttonEls.forEach((b) => (b.disabled = true));
@@ -46,17 +49,17 @@ async function callChat() {
     });
 
     if (!res.ok) {
-      throw new Error("HTTP " + res.status);
+      throw new Error(`HTTP ${res.status}`);
     }
 
     const data = await res.json();
-    const reply = data.reply ?? "(응답 형식이 예상과 다릅니다.)";
+    const reply = data.reply ?? "(Invalid response format)";
     content.textContent = reply;
     setChatStatus("Done");
   } catch (err) {
     console.error(err);
-    content.textContent = "요청 중 오류가 발생했습니다. 콘솔을 확인해주세요.";
-    setChatStatus("Error: " + err.message, true);
+    content.textContent = "An error occurred. Please check the console.";
+    setChatStatus(`Error: ${err.message}`, true);
   } finally {
     buttonEls.forEach((b) => (b.disabled = false));
   }
@@ -66,8 +69,11 @@ async function callChat() {
 
 function setPlanStatus(text, isError = false) {
   const el = document.getElementById("plan-status");
-  el.textContent = text;
-  el.classList.toggle("status-error", isError);
+  if (el) {
+    el.textContent = text;
+    el.classList.toggle("text-danger", isError);
+    el.classList.toggle("text-secondary", !isError);
+  }
 }
 
 function clearPlanOutput() {
@@ -75,7 +81,7 @@ function clearPlanOutput() {
   const raw = document.getElementById("plan-output-raw");
   const box = document.getElementById("plan-output");
 
-  rendered.textContent =
+  rendered.innerHTML =
     "아직 생성된 계획이 없습니다. 목표와 시간을 입력하고 Generate 버튼을 눌러보세요.";
   raw.textContent = "";
   raw.style.display = "none";
@@ -97,7 +103,7 @@ function renderPlan(plan) {
 
   if (!plan) {
     rendered.textContent =
-      "plan 객체가 없습니다. FastAPI 응답 구조를 확인해주세요.";
+      "The 'plan' object is missing. Please check the FastAPI response structure.";
     raw.textContent = "";
     return;
   }
@@ -105,21 +111,25 @@ function renderPlan(plan) {
   const { title, total_hours, focus_topic, slots = [], tips = [] } = plan;
 
   const metaHtml = `
-    <div class="plan-meta">
-      <div><strong>${title ?? "Untitled Plan"}</strong></div>
-      <div class="chips">
-        <span class="chip">Total: ${total_hours ?? "?"}h</span>
-        ${focus_topic ? `<span class="chip">Focus: ${focus_topic}</span>` : ""}
-      </div>
+    <h6 class="card-subtitle mb-2">${title ?? "Untitled Plan"}</h6>
+    <div class="mb-3">
+      <span class="badge bg-primary me-1">Total: ${
+        total_hours ?? "?"
+      }h</span>
+      ${
+        focus_topic
+          ? `<span class="badge bg-info">${focus_topic}</span>`
+          : ""
+      }
     </div>
   `;
 
   const slotsHtml =
     slots.length > 0
       ? `
-    <div style="margin-top:4px;">
-      <div style="font-size:0.78rem; font-weight:500; color:var(--text); margin-bottom:2px;">Time Slots</div>
-      <ul class="slots-list">
+    <div>
+      <h6 class="small mb-2">Time Slots</h6>
+      <ul class="list-group list-group-flush">
         ${slots
           .map((s) => {
             const start = s.start_time ?? "?";
@@ -127,11 +137,15 @@ function renderPlan(plan) {
             const task = s.task ?? "";
             const category = s.category ?? "";
             return `
-              <li>
-                <span class="slot-time">${start}–${end}</span>
-                <span class="slot-task">${task}</span>
+              <li class="list-group-item bg-transparent px-0 py-2">
+                <div class="d-flex w-100 justify-content-between">
+                  <p class="mb-1">${task}</p>
+                  <small class="text-nowrap ps-2">${start}–${end}</small>
+                </div>
                 ${
-                  category ? `<div class="slot-category">${category}</div>` : ""
+                  category
+                    ? `<small class="text-secondary">${category}</small>`
+                    : ""
                 }
               </li>
             `;
@@ -145,17 +159,16 @@ function renderPlan(plan) {
   const tipsHtml =
     tips.length > 0
       ? `
-    <div style="margin-top:6px;">
-      <div style="font-size:0.78rem; font-weight:500; color:var(--text); margin-bottom:2px;">Tips</div>
-      <ul class="tips-list">
-        ${tips.map((t) => `<li>${t}</li>`).join("")}
+    <div class="mt-3">
+      <h6 class="small mb-2">Tips</h6>
+      <ul class="list-unstyled small">
+        ${tips.map((t) => `<li class="mb-1">💡 ${t}</li>`).join("")}
       </ul>
     </div>
   `
       : "";
 
   rendered.innerHTML = metaHtml + slotsHtml + tipsHtml;
-
   raw.textContent = JSON.stringify(plan, null, 2);
 }
 
@@ -165,7 +178,7 @@ async function callPlan() {
   const level = document.getElementById("plan-level").value;
 
   if (!goal) {
-    alert("Goal을 입력해주세요.");
+    alert("Please enter a goal.");
     return;
   }
 
@@ -176,9 +189,9 @@ async function callPlan() {
   const raw = document.getElementById("plan-output-raw");
 
   box.classList.remove("empty");
-  rendered.textContent = "계획을 생성하는 중입니다...";
+  rendered.innerHTML = "Generating plan...";
   raw.textContent = "";
-  setPlanStatus("Generating plan...");
+  setPlanStatus("Generating...");
 
   const buttonEls = document.querySelectorAll("button");
   buttonEls.forEach((b) => (b.disabled = true));
@@ -195,18 +208,18 @@ async function callPlan() {
     });
 
     if (!res.ok) {
-      throw new Error("HTTP " + res.status);
+      throw new Error(`HTTP ${res.status}`);
     }
 
     const data = await res.json();
-    const plan = data.plan ?? data; // 혹시 plan 키 없이 반환되면 fallback
+    const plan = data.plan ?? data; // Fallback if 'plan' key is missing
     renderPlan(plan);
     setPlanStatus("Done");
   } catch (err) {
     console.error(err);
-    rendered.textContent = "요청 중 오류가 발생했습니다. 콘솔을 확인해주세요.";
+    rendered.textContent = "An error occurred. Please check the console.";
     raw.textContent = "";
-    setPlanStatus("Error: " + err.message, true);
+    setPlanStatus(`Error: ${err.message}`, true);
   } finally {
     buttonEls.forEach((b) => (b.disabled = false));
   }
