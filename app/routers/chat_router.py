@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from app.schema.chat import ChatRequest, ChatResponse
-from app.chain.chat_chain import build_chat_chain
+from app.schemas.chat import ChatRequest, ChatResponse
+from app.chains.chat_chain import build_chat_chain
 
 
 router = APIRouter(prefix="/chat", tags=["chat"])

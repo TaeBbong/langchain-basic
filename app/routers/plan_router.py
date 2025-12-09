@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from app.schema.plan import PlanRequest, PlanResponse
-from app.chain.plan_chain import build_plan_chain
+from app.schemas.plan import PlanRequest, PlanResponse
+from app.chains.plan_chain import build_plan_chain
 
 
 router = APIRouter(prefix="/plan", tags=["plan"])

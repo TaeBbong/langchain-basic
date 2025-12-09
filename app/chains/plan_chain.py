@@ -3,7 +3,7 @@ from langchain_core.runnables import Runnable
 from langchain_core.output_parsers import PydanticOutputParser
 
 from app.core.llm import get_llm
-from app.schema.plan import StudyPlan
+from app.schemas.plan import StudyPlan
 
 
 def build_plan_chain() -> Runnable:

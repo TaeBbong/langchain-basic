@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app.router import chat_router, plan_router
+from app.routers import chat_router, plan_router
 
 
 app = FastAPI(title="LangChain Playground API")
