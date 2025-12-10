@@ -11,8 +11,12 @@ class Settings(BaseSettings):
     openai_api_key: str = "dummy-key"
     openai_model: str = "local-model"
 
+    affine_base_url: str
+    affine_api_token: str
+
     class Config:
         env_file = ".env"
+        env_file_encoding = "utf-8"
 
 
 settings = Settings()
