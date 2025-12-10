@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.chains.chat_chain import build_chat_chain
 from app.chains.agent_chain import build_agent_chain
+from app.core.callbacks import AgentDebugHandler
 
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -9,7 +10,8 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 @router.post("", response_model=ChatResponse)
 async def chat(req: ChatRequest):
-    agent = build_agent_chain()
+    agent = await build_agent_chain()
+    handler = AgentDebugHandler()
     result = await agent.ainvoke(
         {
             "messages": [
@@ -22,7 +24,8 @@ async def chat(req: ChatRequest):
                     "content": req.user_message,
                 },
             ]
-        }
+        },
+        config={"callbacks": [handler]}
     )
     return ChatResponse(reply=result)
 

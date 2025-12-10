@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     openai_model: str = "local-model"
 
     affine_base_url: str
+    affine_email: str
+    affine_password: str
     affine_api_token: str
 
     class Config:

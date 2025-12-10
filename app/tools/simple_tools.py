@@ -19,4 +19,4 @@ def multiply(a: int, b: int) -> str:
     return str(a * b)
 
 
-tools = [count_letters_from_word, multiply]
+simple_tools = [count_letters_from_word, multiply]
