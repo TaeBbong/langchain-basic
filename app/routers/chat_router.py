@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 from app.schemas.chat import ChatRequest, ChatResponse
-from app.chains.chat_chain import build_chat_chain
 from app.chains.agent_chain import build_agent_chain
 from app.core.callbacks import AgentDebugHandler
 
@@ -29,11 +28,11 @@ async def chat(req: ChatRequest):
     )
     return ChatResponse(reply=result)
 
-    chain = build_chat_chain()
-    reply: str = await chain.ainvoke(
-        {
-            "system_prompt": req.system_prompt,
-            "user_message": req.user_message,
-        }
-    )
-    return ChatResponse(reply=reply)
+    # chain = build_chat_chain()
+    # reply: str = await chain.ainvoke(
+    #     {
+    #         "system_prompt": req.system_prompt,
+    #         "user_message": req.user_message,
+    #     }
+    # )
+    # return ChatResponse(reply=reply)
