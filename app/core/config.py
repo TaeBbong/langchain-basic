@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     affine_password: str
     affine_api_token: str
 
+    ida_command: str
+    ida_args: str
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

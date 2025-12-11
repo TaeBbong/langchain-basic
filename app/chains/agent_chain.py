@@ -39,13 +39,24 @@ async def build_agent_chain() -> Runnable:
                     "AFFINE_LOGIN_AT_START": "sync",
                 },
             },
+            "ida": {
+                "transport": "stdio",
+                "command": settings.ida_command,
+                "args": [settings.ida_args],
+            }
         }
     )
 
-    target_tools = ["list_workspaces", "list_docs"]
+    target_affine_tools = ["list_workspaces", "list_docs"]
+    target_ida_tools = ["get_metadata", "get_current_function", "list_functions", "get_entry_points"]
+
     affine_tools: list = await client.get_tools(server_name="affine")
-    tools = [t for t in affine_tools if t.name in target_tools]
+    ida_tools: list = await client.get_tools(server_name="ida")
+
+    tools = []
     tools += simple_tools
+    tools += [t for t in affine_tools if t.name in target_affine_tools]
+    tools += [t for t in ida_tools if t.name in target_ida_tools]
 
     agent = create_agent(model=llm, tools=tools)
     to_str = RunnableLambda(
