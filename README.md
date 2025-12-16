@@ -29,7 +29,43 @@ The backend purposely is not published to the host for safety. If you want to hi
 
 ### Environment variables
 
-Populate the root `.env` file (sample keys are already listed) before running Docker Compose. The backend service imports everything from this file via `env_file` so secrets/config stay out of the image build.
+Populate the root `.env` file before running Docker Compose. The backend service imports everything from this file via `env_file` so secrets/config stay out of the image build.
+
+```bash
+# LLM
+OLLAMA_BASE_URL="http://host.docker.internal:11434"
+
+# Affine MCP
+AFFINE_BASE_URL="http://host.docker.internal:3010"
+AFFINE_API_TOKEN="your-api-token"
+AFFINE_EMAIL="your-email@example.com"
+AFFINE_PASSWORD="your-password"
+
+# IDA MCP (SSE server running on host)
+IDA_MCP_URL="http://host.docker.internal:8744/sse"
+```
+
+> **Note:** `host.docker.internal` allows Docker containers to connect to services running on the host machine.
+
+### MCP Server Setup
+
+The backend uses [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) to integrate with external tools.
+
+#### Affine MCP
+
+Affine MCP is automatically installed in the Docker image via `npm install -g affine-mcp-server`. It supports email/password authentication.
+
+#### IDA MCP
+
+Since IDA Pro is a GUI application with licensing requirements, it runs on the host machine. The Docker container connects to it via SSE transport.
+
+**On the host machine**, start IDA Pro and run the MCP server:
+
+```bash
+uv run ida-pro-mcp --transport http://127.0.0.1:8744/sse
+```
+
+The Docker container will connect to `host.docker.internal:8744` to communicate with IDA Pro.
 
 ### GPU passthrough (Linux/NVIDIA hosts)
 

@@ -16,8 +16,7 @@ class Settings(BaseSettings):
     affine_password: str
     affine_api_token: str
 
-    ida_command: str
-    ida_args: str
+    ida_mcp_url: str = "http://host.docker.internal:8744/sse"
 
     class Config:
         env_file = ".env"

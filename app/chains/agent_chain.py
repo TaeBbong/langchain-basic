@@ -23,9 +23,8 @@ async def build_agent_chain() -> Runnable:
                 },
             },
             "ida": {
-                "transport": "stdio",
-                "command": settings.ida_command,
-                "args": [settings.ida_args],
+                "transport": "sse",
+                "url": settings.ida_mcp_url,
             }
         }
     )

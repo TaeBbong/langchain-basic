@@ -6,6 +6,8 @@ x-backend-base: &backend-base
     - .env
   expose:
     - "8000"
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
   networks:
     default:
       aliases:
